@@ -141,3 +141,23 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# .NET / general
+.dotnet/
+.local/
+.nuget/
+.templateengine/
+obj/
+bin/
+*.user
+*.suo
+*.userprefs
+*.pidb
+*.vspscc
+*.vssscc
+_ReSharper.*
+*.ReSharper.*
+.DS_Store
+Thumbs.db
+.vs/
+workspace/

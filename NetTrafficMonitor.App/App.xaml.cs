@@ -1,0 +1,171 @@
+using System;
+using System.IO;
+using System.IO.Abstractions;
+using System.Windows;
+using System.Windows.Forms;
+using Microsoft.Data.Sqlite;
+using NetTrafficMonitor.Core.Data;
+using NetTrafficMonitor.Core.Models;
+using NetTrafficMonitor.Core.Services;
+using NetTrafficMonitor.Service;
+using NetTrafficMonitor.ViewModels;
+using NetTrafficMonitor.Views;
+
+namespace NetTrafficMonitor;
+
+public partial class App : System.Windows.Application
+{
+    private NotifyIcon? _trayIcon;
+    private NetworkMonitorService? _monitor;
+    private UserPreferences? _prefs;
+    private SqliteConnection? _conn;
+    private MainWindow? _settingsWindow;
+    private HudWindow? _hudWindow;
+
+    private string DbPath =>
+        Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "NetTrafficMonitor", "data.db");
+
+    private const string MutexName = "NetTrafficMonitor-SingleInstance";
+
+    protected override async void OnStartup(StartupEventArgs e)
+    {
+        base.OnStartup(e);
+
+        using var mutex = new Mutex(true, MutexName, out bool createdNew);
+        if (!createdNew) { Shutdown(); return; }
+
+        Directory.CreateDirectory(Path.GetDirectoryName(DbPath)!);
+
+        // Init DB
+        var dbInit = new DatabaseInitializer(DbPath);
+        await dbInit.InitializeAsync();
+        _conn = dbInit.CreateConnection();
+
+        // Load preferences
+        _prefs = new UserPreferences();
+        await _prefs.LoadAsync(_conn);
+
+        // Start monitor
+        _monitor = new NetworkMonitorService(DbPath);
+        await _monitor.InitializeAsync();
+        _monitor.SpeedUpdated += OnSpeedUpdated;
+
+        // Restore selected adapter
+        if (_prefs.SelectedAdapterId > 0)
+            await _monitor.SelectAdapterAsync(_prefs.SelectedAdapterId);
+
+        // Auto-select if nothing selected yet
+        if (_monitor.CurrentAdapterId <= 0)
+        {
+            var adapters = await _monitor.RefreshAdaptersAsync();
+            if (adapters.Count > 0)
+                await _monitor.SelectAdapterAsync(adapters[0].Id);
+        }
+
+        _monitor.Start();
+
+        CreateTrayIcon();
+
+        if (!_prefs.StartMinimized)
+            ShowSettingsWindow();
+    }
+
+    private void CreateTrayIcon()
+    {
+        _trayIcon = new NotifyIcon
+        {
+            Icon = GetOrCreateTrayIcon(),
+            Text = "NetTrafficMonitor\n↓ 0 B/s\n↑ 0 B/s",
+            Visible = true
+        };
+
+        var menu = new ContextMenuStrip();
+        menu.Items.Add("Show Settings", null, (_, _) => ShowSettingsWindow());
+        menu.Items.Add("Toggle HUD", null, (_, _) => ToggleHud());
+        menu.Items.Add(new ToolStripSeparator());
+        menu.Items.Add("Exit", null, async (_, _) => await ShutdownAsync());
+
+        _trayIcon.ContextMenuStrip = menu;
+        _trayIcon.MouseDoubleClick += (_, _) => ShowSettingsWindow();
+    }
+
+    private static System.Drawing.Icon GetOrCreateTrayIcon()
+    {
+        try
+        {
+            // Use a simple 16×16 canvas-drawn icon
+            var bmp = new System.Drawing.Bitmap(16, 16);
+            using var g = System.Drawing.Graphics.FromImage(bmp);
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            using var brush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(0x00, 0x78, 0xD4));
+            g.FillEllipse(brush, 0, 0, 15, 15);
+            var hIcon = bmp.GetHicon();
+            return System.Drawing.Icon.FromHandle(hIcon);
+        }
+        catch
+        {
+            return System.Drawing.SystemIcons.Application;
+        }
+    }
+
+    private async void OnSpeedUpdated((double downBps, double upBps) speed)
+    {
+        if (_prefs is null) return;
+        string down = SpeedConverter.Format(speed.downBps, _prefs.DisplayUnit);
+        string up   = SpeedConverter.Format(speed.upBps,   _prefs.DisplayUnit);
+
+        await Dispatcher.InvokeAsync(() =>
+        {
+            if (_trayIcon is not null)
+                _trayIcon.Text = $"NetTrafficMonitor\n↓ {down}\n↑ {up}";
+
+            if (_hudWindow is not null && _hudWindow.IsVisible)
+                _hudWindow.UpdateSpeed(speed.downBps, speed.upBps);
+        });
+    }
+
+    public void ShowSettingsWindow()
+    {
+        if (_settingsWindow is not { IsVisible: true })
+        {
+            _settingsWindow = new MainWindow(_monitor!, _prefs!, _conn!);
+            _settingsWindow.Show();
+        }
+        _settingsWindow.Activate();
+    }
+
+    public void ToggleHud()
+    {
+        if (_hudWindow is { IsVisible: true })
+        {
+            _hudWindow.Hide();
+            _hudWindow = null;
+            _prefs!.HudEnabled = false;
+        }
+        else
+        {
+            _hudWindow = new HudWindow(_monitor!, _prefs!);
+            _hudWindow.Show();
+            _prefs!.HudEnabled = true;
+        }
+    }
+
+    private async Task ShutdownAsync()
+    {
+        _monitor?.Stop();
+        _prefs?.SaveAsync(_conn!).Wait(2000);
+        _trayIcon?.Dispose();
+        _conn?.Close();
+        _conn?.Dispose();
+        Shutdown();
+    }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        _trayIcon?.Dispose();
+        _monitor?.Dispose();
+        base.OnExit(e);
+    }
+}

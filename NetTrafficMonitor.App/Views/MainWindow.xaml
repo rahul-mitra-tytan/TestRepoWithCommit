@@ -1,0 +1,132 @@
+<Window x:Class="NetTrafficMonitor.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:NetTrafficMonitor.ViewModels"
+        xmlns:conv="clr-namespace:NetTrafficMonitor.Converters"
+        Title="NetTrafficMonitor Settings"
+        Width="660" Height="520"
+        WindowStartupLocation="CenterScreen"
+        Background="#1E1E1E" Foreground="#E0E0E0"
+        FontSize="13">
+
+    <Window.Resources>
+        <conv:SpeedUnitToStringConverter x:Key="SpeedUnitToStr"/>
+        <conv:DataPeriodToStringConverter x:Key="PeriodToStr"/>
+    </Window.Resources>
+
+    <Grid Margin="15">
+        <TabControl Background="#2D2D2D" BorderThickness="0">
+            <!-- ───────── TAB 1: General ───────── -->
+            <TabItem Header="General" Background="#2D2D2D" Foreground="#E0E0E0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10">
+                    <StackPanel>
+                        <Label Content="Network Adapter" Style="{StaticResource SectionHeader}"/>
+                        <ComboBox ItemsSource="{Binding Adapters}"
+                                  SelectedItem="{Binding SelectedAdapter}"
+                                  DisplayMemberPath="Name"
+                                  Height="30" Background="#3C3C3C" Foreground="#E0E0E0"
+                                  BorderThickness="0"/>
+                        <Button Content="Refresh Adapters"
+                                Command="{Binding LoadAdaptersCommand}"
+                                Style="{StaticResource PrimaryButton}"
+                                Margin="0,8,0,0"/>
+
+                        <Label Content="Display Unit" Style="{StaticResource SectionHeader}"/>
+                        <ComboBox ItemsSource="{Binding SpeedUnits}"
+                                  SelectedItem="{Binding SelectedUnit}"
+                                  Height="30" Background="#3C3C3C" Foreground="#E0E0E0"
+                                  BorderThickness="0"/>
+
+                        <Label Content="Font" Style="{StaticResource SectionHeader}"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Family:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBox Grid.Column="1" Text="{Binding FontFamily}" Height="28" Background="#3C3C3C" Foreground="#E0E0E0" BorderThickness="0"/>
+                            <TextBlock Grid.Column="2" Text="Size:" VerticalAlignment="Center" Margin="8,0,8,0"/>
+                            <TextBox Grid.Column="3" Text="{Binding FontSize}" Height="28" Background="#3C3C3C" Foreground="#E0E0E0" BorderThickness="0"/>
+                        </Grid>
+
+                        <Label Content="Behaviour" Style="{StaticResource SectionHeader}"/>
+                        <CheckBox IsChecked="{Binding StartMinimized}" Content="Start minimized to tray" Margin="0,4"/>
+                        <CheckBox IsChecked="{Binding MinimizeToTray}" Content="Minimize to tray instead of taskbar" Margin="0,4"/>
+                        <CheckBox IsChecked="{Binding RunOnStartup}" Content="Run on Windows startup" Margin="0,4"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ───────── TAB 2: HUD ───────── -->
+            <TabItem Header="HUD" Background="#2D2D2D" Foreground="#E0E0E0">
+                <StackPanel Margin="10">
+                    <Label Content="Heads-Up Display" Style="{StaticResource SectionHeader}"/>
+                    <CheckBox IsChecked="{Binding HudEnabled}" Content="Enable floating HUD window" Margin="0,4"/>
+
+                    <GroupBox Header="Appearance" Margin="0,12,0,0">
+                        <StackPanel>
+                            <Grid Margin="0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Opacity:" VerticalAlignment="Center"/>
+                                <Slider Grid.Column="1" Minimum="0.1" Maximum="1.0" SmallChange="0.05"
+                                        Value="{Binding HudOpacity}" Margin="8,0"/>
+                            </Grid>
+                            <Grid Margin="0,8,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Font Size:" VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="1" Text="{Binding FontSize}" Height="28"
+                                         Background="#3C3C3C" Foreground="#E0E0E0" BorderThickness="0"/>
+                            </Grid>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <TextBlock Text="Tip: HUD can be made click-through from the tray menu."
+                               Foreground="#888" FontSize="11" Margin="0,8,0,0"/>
+                </StackPanel>
+            </TabItem>
+
+            <!-- ───────── TAB 3: Data Usage ───────── -->
+            <TabItem Header="Data Usage" Background="#2D2D2D" Foreground="#E0E0E0">
+                <StackPanel Margin="10">
+                    <Label Content="Usage Summary" Style="{StaticResource SectionHeader}"/>
+                    <ComboBox ItemsSource="{Binding DataPeriods}"
+                              SelectedItem="{Binding SelectedPeriod}"
+                              Height="30" Background="#3C3C3C" Foreground="#E0E0E0"
+                              BorderThickness="0" Margin="0,0,0,12"/>
+
+                    <GroupBox Header="Download">
+                        <TextBlock Text="{Binding PeriodFormattedDownload}"
+                                   FontSize="24" FontWeight="Bold" Foreground="#4CAF50"
+                                   HorizontalAlignment="Center" Margin="10"/>
+                    </GroupBox>
+                    <GroupBox Header="Upload">
+                        <TextBlock Text="{Binding PeriodFormattedUpload}"
+                                   FontSize="24" FontWeight="Bold" Foreground="#FF9800"
+                                   HorizontalAlignment="Center" Margin="10"/>
+                    </GroupBox>
+
+                    <Button Content="Refresh"
+                            Command="{Binding RefreshUsageCommand}"
+                            Style="{StaticResource PrimaryButton}"
+                            HorizontalAlignment="Center" Margin="0,8,0,0"/>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+
+        <!-- Save button at bottom -->
+        <Button Content="Save Settings"
+                Command="{Binding SaveCommand}"
+                Style="{StaticResource PrimaryButton}"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Margin="0,10,0,0"/>
+    </Grid>
+</Window>
