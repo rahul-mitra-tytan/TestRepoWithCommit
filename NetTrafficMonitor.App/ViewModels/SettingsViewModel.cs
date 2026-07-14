@@ -6,6 +6,7 @@ using Microsoft.Data.Sqlite;
 using NetTrafficMonitor.Core.Data;
 using NetTrafficMonitor.Core.Models;
 using NetTrafficMonitor.Core.Services;
+using NetTrafficMonitor.Service;
 
 namespace NetTrafficMonitor.ViewModels;
 
