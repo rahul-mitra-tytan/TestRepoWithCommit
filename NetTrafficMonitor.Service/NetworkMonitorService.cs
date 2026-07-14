@@ -31,6 +31,10 @@ public class NetworkMonitorService : IDisposable
     private long _lastTotalBytesReceived;
     private long _lastTotalBytesSent;
 
+    // Snapshot tracking for delta storage
+    private long _lastSnapshotBytesReceived;
+    private long _lastSnapshotBytesSent;
+
     public event Action<(double downBps, double upBps)>? SpeedUpdated;
 
     public NetworkMonitorService(string dbPath)
@@ -115,18 +119,20 @@ public class NetworkMonitorService : IDisposable
         RecreateCounters();
     }
 
-    /// <summary>Snap cumulative usage into data_usage table.</summary>
-    private void SnapshotCumulative(long bytesDown, long bytesUp)
+    /// <summary>Snapshot delta bytes (since last snapshot) into data_usage table.</summary>
+    private void SnapshotDelta(long deltaDown, long deltaUp)
     {
         if (_conn == null || _currentAdapterId <= 0) return;
+        if (deltaDown < 0) deltaDown = 0;
+        if (deltaUp < 0) deltaUp = 0;
         try
         {
             using var cmd = _conn.CreateCommand();
             cmd.CommandText = @"INSERT INTO data_usage (AdapterId, BytesDownloaded, BytesUploaded, RecordedAt)
                                 VALUES (@aid, @down, @up, @now)";
             cmd.Parameters.AddWithValue("@aid", _currentAdapterId);
-            cmd.Parameters.AddWithValue("@down", bytesDown);
-            cmd.Parameters.AddWithValue("@up", bytesUp);
+            cmd.Parameters.AddWithValue("@down", deltaDown);
+            cmd.Parameters.AddWithValue("@up", deltaUp);
             cmd.Parameters.AddWithValue("@now", DateTime.UtcNow.ToString("o"));
             cmd.ExecuteNonQuery();
         }
@@ -142,6 +148,8 @@ public class NetworkMonitorService : IDisposable
         GetCurrentTotals(out long initRecv, out long initSent);
         _lastTotalBytesReceived = initRecv;
         _lastTotalBytesSent = initSent;
+        _lastSnapshotBytesReceived = initRecv;
+        _lastSnapshotBytesSent = initSent;
 
         RecreateCounters();
 
@@ -196,12 +204,19 @@ public class NetworkMonitorService : IDisposable
 
                 SpeedUpdated?.Invoke((CurrentDownloadBps, CurrentUploadBps));
 
-                // Snapshot cumulative every ~10 seconds
+                // Snapshot delta every ~10 seconds
                 sampleCount++;
                 if (sampleCount % 10 == 0)
                 {
                     GetCurrentTotals(out long r, out long s);
-                    SnapshotCumulative(r, s);
+                    long deltaDown = r - _lastSnapshotBytesReceived;
+                    long deltaUp = s - _lastSnapshotBytesSent;
+                    if (deltaDown >= 0 && deltaUp >= 0)
+                    {
+                        SnapshotDelta(deltaDown, deltaUp);
+                    }
+                    _lastSnapshotBytesReceived = r;
+                    _lastSnapshotBytesSent = s;
                 }
             }
             catch
@@ -212,9 +227,14 @@ public class NetworkMonitorService : IDisposable
             Thread.Sleep(1000);
         }
 
-        // Final snapshot on stop
+        // Final delta on stop
         GetCurrentTotals(out long fr, out long fs);
-        SnapshotCumulative(fr, fs);
+        long finalDeltaDown = fr - _lastSnapshotBytesReceived;
+        long finalDeltaUp = fs - _lastSnapshotBytesSent;
+        if (finalDeltaDown >= 0 && finalDeltaUp >= 0)
+        {
+            SnapshotDelta(finalDeltaDown, finalDeltaUp);
+        }
     }
 
     private void GetCurrentTotals(out long received, out long sent)
