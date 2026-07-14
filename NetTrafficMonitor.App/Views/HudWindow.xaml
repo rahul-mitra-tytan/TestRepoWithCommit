@@ -7,7 +7,15 @@
         Width="260" Height="90"
         WindowStartupLocation="Manual">
 
-    <Border CornerRadius="8" Background="#AA1E1E1E" BorderBrush="#555" BorderThickness="1"
+    <Window.Resources>
+        <SolidColorBrush x:Key="HudBackground" Color="#AA1E1E1E"/>
+        <SolidColorBrush x:Key="HudBorder" Color="#555555"/>
+        <SolidColorBrush x:Key="HudTextSecondary" Color="#AAAAAA"/>
+        <SolidColorBrush x:Key="HudDownloadColor" Color="#4CAF50"/>
+        <SolidColorBrush x:Key="HudUploadColor" Color="#FF9800"/>
+    </Window.Resources>
+
+    <Border CornerRadius="8" Background="{StaticResource HudBackground}" BorderBrush="{StaticResource HudBorder}" BorderThickness="1"
             Padding="12">
         <Border.Style>
             <Style TargetType="Border">
@@ -31,21 +39,21 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding Title}"
-                       FontSize="11" Foreground="#AAA" Margin="0,0,0,4"
+                       FontSize="11" Foreground="{StaticResource HudTextSecondary}" Margin="0,0,0,4"
                        HorizontalAlignment="Center"/>
 
             <!-- Download -->
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="↓" Foreground="#4CAF50"
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="↓" Foreground="{StaticResource HudDownloadColor}"
                        FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
             <TextBlock Grid.Row="1" Grid.Column="1" x:Name="DownloadText"
-                       Text="0 Mb/s" Foreground="#4CAF50"
+                       Text="0 Mb/s" Foreground="{StaticResource HudDownloadColor}"
                        FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
 
             <!-- Upload -->
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="↑" Foreground="#FF9800"
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="↑" Foreground="{StaticResource HudUploadColor}"
                        FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
             <TextBlock Grid.Row="2" Grid.Column="1" x:Name="UploadText"
-                       Text="0 Mb/s" Foreground="#FF9800"
+                       Text="0 Mb/s" Foreground="{StaticResource HudUploadColor}"
                        FontSize="20" FontWeight="Bold" VerticalAlignment="Center"/>
         </Grid>
     </Border>
