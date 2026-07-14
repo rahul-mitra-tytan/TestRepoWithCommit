@@ -11,3 +11,11 @@ public enum SpeedUnit
     Mbps,     // megabits/s
     Gbps      // gigabits/s
 }
+
+public enum DataSizeUnit
+{
+    KB,
+    MB,
+    GB,
+    TB
+}

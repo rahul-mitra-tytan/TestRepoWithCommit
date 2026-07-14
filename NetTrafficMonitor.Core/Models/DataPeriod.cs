@@ -4,5 +4,6 @@ public enum DataPeriod
 {
     Today,
     ThisWeek,
-    ThisMonth
+    ThisMonth,
+    Custom
 }
