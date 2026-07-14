@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.IO.Abstractions;
 using System.Windows;
 using System.Windows.Forms;
 using Microsoft.Data.Sqlite;
@@ -28,6 +27,12 @@ public partial class App : System.Windows.Application
             "NetTrafficMonitor", "data.db");
 
     private const string MutexName = "NetTrafficMonitor-SingleInstance";
+
+    public bool MinimizeToTray
+    {
+        get => _prefs?.MinimizeToTray ?? false;
+        set { if (_prefs is not null) _prefs.MinimizeToTray = value; }
+    }
 
     protected override async void OnStartup(StartupEventArgs e)
     {
