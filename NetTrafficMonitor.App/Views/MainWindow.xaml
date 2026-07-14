@@ -9,7 +9,6 @@
         Background="{StaticResource DarkBg}"
         Foreground="{StaticResource DarkText}"
         FontSize="13">
-
     <Window.Resources>
         <conv:SpeedUnitToStringConverter x:Key="SpeedUnitToStr"/>
         <conv:DataPeriodToStringConverter x:Key="PeriodToStr"/>
@@ -22,20 +21,10 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10">
                     <StackPanel>
                         <Label Content="Network Adapter" Style="{StaticResource SectionHeader}"/>
-                        <ComboBox ItemsSource="{Binding Adapters}"
-                                  SelectedItem="{Binding SelectedAdapter}"
-                                  DisplayMemberPath="Name"
-                                  Height="30" />
-                        <Button Content="Refresh Adapters"
-                                Command="{Binding LoadAdaptersCommand}"
-                                Style="{StaticResource PrimaryButton}"
-                                Margin="0,8,0,0"/>
-
+                        <ComboBox ItemsSource="{Binding Adapters}" SelectedItem="{Binding SelectedAdapter}" DisplayMemberPath="Name" Height="30" />
+                        <Button Content="Refresh Adapters" Command="{Binding LoadAdaptersCommand}" Style="{StaticResource PrimaryButton}" Margin="0,8,0,0"/>
                         <Label Content="Display Unit" Style="{StaticResource SectionHeader}"/>
-                        <ComboBox ItemsSource="{Binding SpeedUnits}"
-                                  SelectedItem="{Binding SelectedUnit}"
-                                  Height="30" />
-
+                        <ComboBox ItemsSource="{Binding SpeedUnits}" SelectedItem="{Binding SelectedUnit}" Height="30" />
                         <Label Content="Font" Style="{StaticResource SectionHeader}"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -49,7 +38,6 @@
                             <TextBlock Grid.Column="2" Text="Size:" VerticalAlignment="Center" Margin="8,0,8,0"/>
                             <TextBox Grid.Column="3" Text="{Binding FontSize}" Height="28" />
                         </Grid>
-
                         <Label Content="Behaviour" Style="{StaticResource SectionHeader}"/>
                         <CheckBox IsChecked="{Binding StartMinimized}" Content="Start minimized to tray" Margin="0,4"/>
                         <CheckBox IsChecked="{Binding MinimizeToTray}" Content="Minimize to tray instead of taskbar" Margin="0,4"/>
@@ -63,7 +51,6 @@
                 <StackPanel Margin="10">
                     <Label Content="Heads-Up Display" Style="{StaticResource SectionHeader}"/>
                     <CheckBox IsChecked="{Binding HudEnabled}" Content="Enable floating HUD window" Margin="0,4"/>
-
                     <GroupBox Header="Appearance" Margin="0,12,0,0">
                         <StackPanel>
                             <Grid Margin="0,4">
@@ -72,8 +59,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="Opacity:" VerticalAlignment="Center"/>
-                                <Slider Grid.Column="1" Minimum="0.1" Maximum="1.0" SmallChange="0.05"
-                                        Value="{Binding HudOpacity}" Margin="8,0"/>
+                                <Slider Grid.Column="1" Minimum="0.1" Maximum="1.0" SmallChange="0.05" Value="{Binding HudOpacity}" Margin="8,0"/>
                             </Grid>
                             <Grid Margin="0,8,0,0">
                                 <Grid.ColumnDefinitions>
@@ -85,45 +71,61 @@
                             </Grid>
                         </StackPanel>
                     </GroupBox>
-
-                    <TextBlock Text="Tip: HUD can be made click-through from the tray menu."
-                               Foreground="{StaticResource DarkTextSecondary}" FontSize="11" Margin="0,8,0,0"/>
+                    <TextBlock Text="Tip: HUD can be made click-through from the tray menu." Foreground="{StaticResource DarkTextSecondary}" FontSize="11" Margin="0,8,0,0"/>
                 </StackPanel>
             </TabItem>
 
             <!-- ───────── TAB 3: Data Usage ───────── -->
             <TabItem Header="Data Usage">
-                <StackPanel Margin="10">
-                    <Label Content="Usage Summary" Style="{StaticResource SectionHeader}"/>
-                    <ComboBox ItemsSource="{Binding DataPeriods}"
-                              SelectedItem="{Binding SelectedPeriod}"
-                              Height="30" Margin="0,0,0,12"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10">
+                    <StackPanel>
+                        <Label Content="Usage Summary" Style="{StaticResource SectionHeader}"/>
 
-                    <GroupBox Header="Download">
-                        <TextBlock Text="{Binding PeriodFormattedDownload}"
-                                   FontSize="24" FontWeight="Bold" Foreground="{StaticResource GreenBrush}"
-                                   HorizontalAlignment="Center" Margin="10"/>
-                    </GroupBox>
-                    <GroupBox Header="Upload">
-                        <TextBlock Text="{Binding PeriodFormattedUpload}"
-                                   FontSize="24" FontWeight="Bold" Foreground="{StaticResource OrangeBrush}"
-                                   HorizontalAlignment="Center" Margin="10"/>
-                    </GroupBox>
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Period:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding DataPeriods}" SelectedItem="{Binding SelectedPeriod}" Height="30"/>
+                        </Grid>
 
-                    <Button Content="Refresh"
-                            Command="{Binding RefreshUsageCommand}"
-                            Style="{StaticResource PrimaryButton}"
-                            HorizontalAlignment="Center" Margin="0,8,0,0"/>
-                </StackPanel>
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="From:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <DatePicker Grid.Column="1" SelectedDate="{Binding StartDate, Mode=TwoWay}" Height="28"/>
+                            <TextBlock Grid.Column="2" Text="To:" VerticalAlignment="Center" Margin="8,0,8,0"/>
+                            <DatePicker Grid.Column="3" SelectedDate="{Binding EndDate, Mode=TwoWay}" Height="28"/>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Unit:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding DataSizeUnits}" SelectedItem="{Binding SelectedDataSizeUnit}" Height="30"/>
+                        </Grid>
+
+                        <GroupBox Header="Download" Margin="0,0,0,8">
+                            <TextBlock Text="{Binding PeriodFormattedDownload}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource GreenBrush}" HorizontalAlignment="Center" Margin="10"/>
+                        </GroupBox>
+                        <GroupBox Header="Upload" Margin="0,0,0,8">
+                            <TextBlock Text="{Binding PeriodFormattedUpload}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource OrangeBrush}" HorizontalAlignment="Center" Margin="10"/>
+                        </GroupBox>
+
+                        <Button Content="Refresh" Command="{Binding RefreshUsageCommand}" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Center" Margin="0,8,0,0"/>
+                    </StackPanel>
+                </ScrollViewer>
             </TabItem>
         </TabControl>
 
         <!-- Save button at bottom -->
-        <Button Content="Save Settings"
-                Command="{Binding SaveCommand}"
-                Style="{StaticResource PrimaryButton}"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Bottom"
-                Margin="0,10,0,0"/>
+        <Button Content="Save Settings" Command="{Binding SaveCommand}" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,10,0,0"/>
     </Grid>
 </Window>

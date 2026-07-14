@@ -9,6 +9,7 @@ public class UserPreferences
 
     // Defaults
     public SpeedUnit DisplayUnit { get; set; } = SpeedUnit.Mbps;
+    public DataSizeUnit DataUsageDisplayUnit { get; set; } = DataSizeUnit.MB;
     public double PollingIntervalSeconds { get; set; } = 1.0;
     public string FontFamily { get; set; } = "Segoe UI";
     public double FontSize { get; set; } = 12.0;
@@ -65,6 +66,9 @@ public class UserPreferences
         {
             case nameof(DisplayUnit):
                 DisplayUnit = (SpeedUnit)int.Parse(val, CultureInfo.InvariantCulture);
+                break;
+            case nameof(DataUsageDisplayUnit):
+                DataUsageDisplayUnit = (DataSizeUnit)int.Parse(val, CultureInfo.InvariantCulture);
                 break;
             case nameof(PollingIntervalSeconds):
                 PollingIntervalSeconds = double.Parse(val, CultureInfo.InvariantCulture);
