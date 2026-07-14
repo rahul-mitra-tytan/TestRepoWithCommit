@@ -6,6 +6,8 @@
         Title="NetTrafficMonitor Settings"
         Width="660" Height="520"
         WindowStartupLocation="CenterScreen"
+        Background="{StaticResource DarkBg}"
+        Foreground="{StaticResource DarkText}"
         FontSize="13">
 
     <Window.Resources>
@@ -85,7 +87,7 @@
                     </GroupBox>
 
                     <TextBlock Text="Tip: HUD can be made click-through from the tray menu."
-                               Foreground="#888" FontSize="11" Margin="0,8,0,0"/>
+                               Foreground="{StaticResource DarkTextSecondary}" FontSize="11" Margin="0,8,0,0"/>
                 </StackPanel>
             </TabItem>
 
