@@ -210,8 +210,10 @@
                                     BorderThickness="1"
                                     CornerRadius="3"
                                     MaxHeight="{TemplateBinding MaxDropDownHeight}"
-                                    MinWidth="{Binding ActualWidth, ElementName=border}"
-                                    Effect="{DynamicResource {x:Static SystemParameters.DropShadowKey}}">
+                                    MinWidth="{Binding ActualWidth, ElementName=border}">
+                                <Border.Effect>
+                                    <DropShadowEffect ShadowDepth="2" BlurRadius="4" Opacity="0.3" Color="Black"/>
+                                </Border.Effect>
                                 <ScrollViewer x:Name="DropDownScrollViewer"
                                               Margin="0,2,0,2"
                                               SnapsToDevicePixels="True">

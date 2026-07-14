@@ -19,7 +19,7 @@ public partial class MainWindow : Window
 
     protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
     {
-        var app = (App)Application.Current;
+        var app = (App)System.Windows.Application.Current;
         if (app.MinimizeToTray)
         {
             e.Cancel = true;
