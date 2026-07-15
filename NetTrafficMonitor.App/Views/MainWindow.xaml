@@ -13,6 +13,13 @@
         <conv:SpeedUnitToStringConverter x:Key="SpeedUnitToStr"/>
         <conv:DataPeriodToStringConverter x:Key="PeriodToStr"/>
         <conv:ThemeToStringConverter x:Key="ThemeToStr"/>
+        <!-- Theme-aware brushes (both Dark and Light defined for safe fallback) -->
+        <SolidColorBrush x:Key="DarkBg" Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="DarkText" Color="#E0E0E0"/>
+        <SolidColorBrush x:Key="DarkTextSecondary" Color="#AAAAAA"/>
+        <SolidColorBrush x:Key="LightBg" Color="#F2F2F2"/>
+        <SolidColorBrush x:Key="LightText" Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="LightTextSecondary" Color="#666666"/>
     </Window.Resources>
 
     <Grid Margin="15">
