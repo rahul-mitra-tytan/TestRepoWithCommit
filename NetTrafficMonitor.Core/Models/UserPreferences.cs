@@ -70,7 +70,7 @@ public class UserPreferences
                 DisplayUnit = (SpeedUnit)int.Parse(val, CultureInfo.InvariantCulture);
                 break;
             case nameof(DataUsageDisplayUnit):
-                DataUsageDisplayUnit = (DataSizeUnit)int.Parse(val, CultureInfo.InvariantCulture);
+                DataUsageDisplayUnit = (DataSizeUnit)Enum.Parse(typeof(DataSizeUnit), val, ignoreCase: true);
                 break;
             case nameof(Theme):
                 Theme = (Theme)int.Parse(val, CultureInfo.InvariantCulture);
