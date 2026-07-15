@@ -231,7 +231,7 @@
                                     CornerRadius="3"
                                     MaxHeight="{TemplateBinding MaxDropDownHeight}"
                                     MinWidth="{Binding ActualWidth, ElementName=border}"
-                                    Effect="{DynamicResource {x:Static SystemParameters.DropShadowKey}}">
+                                    Effect="{x:Null}">
                                 <ScrollViewer x:Name="DropDownScrollViewer"
                                               Margin="0,2,0,2"
                                               SnapsToDevicePixels="True">
