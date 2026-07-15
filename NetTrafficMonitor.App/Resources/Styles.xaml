@@ -23,8 +23,8 @@
     <Color x:Key="LightTextSecondaryColor">#666666</Color>
 
     <Color x:Key="AccentColor">#0078D4</Color>
-    <Color x:Key="AccentHoverColor">#1A86D9</Color>
-    <Color x:Key="AccentPressedColor">#005A9E</Color>
+<Color x:Key="AccentHoverColor">#1A86D9</Color>
+<Color x:Key="AccentPressedColor">#005A9E</Color>
     <Color x:Key="GreenColor">#36A300</Color>
     <Color x:Key="OrangeColor">#FF8C00</Color>
 
@@ -65,10 +65,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{StaticResource AccentHoverColor}"/>
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource AccentHoverBrush}"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{StaticResource AccentPressedColor}"/>
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource AccentPressedBrush}"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="border" Property="Opacity" Value="0.5"/>
