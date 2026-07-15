@@ -6,8 +6,8 @@
         Title="NetTrafficMonitor Settings"
         Width="660" Height="520"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource BgBrush}"
-        Foreground="{StaticResource TextBrush}"
+        Background="#1E1E1E"
+        Foreground="#E0E0E0"
         FontSize="13">
     <Window.Resources>
         <conv:SpeedUnitToStringConverter x:Key="SpeedUnitToStr"/>
