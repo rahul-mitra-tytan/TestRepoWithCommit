@@ -29,6 +29,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
 
         _speedUnits = new ObservableCollection<SpeedUnit>(Enum.GetValues<SpeedUnit>());
         _selectedUnit = _prefs.DisplayUnit;
+_selectedTheme = _prefs.Theme;
 
         _dataSizeUnits = new ObservableCollection<DataSizeUnit>(Enum.GetValues<DataSizeUnit>());
         _selectedDataSizeUnit = _prefs.DataUsageDisplayUnit;
