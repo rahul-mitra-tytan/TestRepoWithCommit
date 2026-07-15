@@ -87,7 +87,7 @@ public partial class App : System.Windows.Application
         var theme = _prefs.Theme;
         Dispatcher.InvokeAsync(() =>
         {
-            var resources = Application.Current.Resources as ResourceDictionary;
+            var resources = System.Windows.Application.Current?.Resources as ResourceDictionary;
             if (resources == null) return;
 
             var merged = resources.MergedDictionaries;

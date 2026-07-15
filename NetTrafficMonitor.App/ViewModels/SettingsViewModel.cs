@@ -107,7 +107,6 @@ public partial class SettingsViewModel : INotifyPropertyChanged
         {
             _selectedTheme = value;
             _prefs.Theme = value;
-            ApplyTheme();
             OnPropertyChanged();
         }
     }
