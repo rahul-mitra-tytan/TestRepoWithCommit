@@ -6,20 +6,23 @@
         Title="NetTrafficMonitor Settings"
         Width="660" Height="520"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource DarkBg}"
-        Foreground="{StaticResource DarkText}"
+        Background="{StaticResource BgBrush}"
+        Foreground="{StaticResource TextBrush}"
         FontSize="13">
     <Window.Resources>
         <conv:SpeedUnitToStringConverter x:Key="SpeedUnitToStr"/>
         <conv:DataPeriodToStringConverter x:Key="PeriodToStr"/>
         <conv:ThemeToStringConverter x:Key="ThemeToStr"/>
-        <!-- Theme-aware brushes (both Dark and Light defined for safe fallback) -->
-        <SolidColorBrush x:Key="DarkBg" Color="#1E1E1E"/>
-        <SolidColorBrush x:Key="DarkText" Color="#E0E0E0"/>
-        <SolidColorBrush x:Key="DarkTextSecondary" Color="#AAAAAA"/>
-        <SolidColorBrush x:Key="LightBg" Color="#F2F2F2"/>
-        <SolidColorBrush x:Key="LightText" Color="#1E1E1E"/>
-        <SolidColorBrush x:Key="LightTextSecondary" Color="#666666"/>
+        <SolidColorBrush x:Key="BgBrush" Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="TextBrush" Color="#E0E0E0"/>
+        <SolidColorBrush x:Key="SubTextBrush" Color="#AAAAAA"/>
+        <SolidColorBrush x:Key="SurfaceBrush" Color="#2D2D2D"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#3A3A3A"/>
+        <SolidColorBrush x:Key="HoverBrush" Color="#3D3D3D"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#0078D4"/>
+        <SolidColorBrush x:Key="ButtonBg" Color="#005A9E"/>
+        <SolidColorBrush x:Key="ButtonText" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="ButtonHoverBg" Color="#0066CC"/>
     </Window.Resources>
 
     <Grid Margin="15">
@@ -81,7 +84,7 @@
                             </Grid>
                         </StackPanel>
                     </GroupBox>
-                    <TextBlock Text="Tip: HUD can be made click-through from the tray menu." Foreground="{StaticResource DarkTextSecondary}" FontSize="11" Margin="0,8,0,0"/>
+                    <TextBlock Text="Tip: HUD can be made click-through from the tray menu." Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" Margin="0,8,0,0"/>
                 </StackPanel>
             </TabItem>
 

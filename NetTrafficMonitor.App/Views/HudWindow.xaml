@@ -8,11 +8,12 @@
         WindowStartupLocation="Manual">
 
     <Window.Resources>
-        <SolidColorBrush x:Key="HudBackground" Color="#AA1E1E1E"/>
-        <SolidColorBrush x:Key="HudBorder" Color="#555555"/>
-        <SolidColorBrush x:Key="HudTextSecondary" Color="#AAAAAA"/>
-        <SolidColorBrush x:Key="HudDownloadColor" Color="#4CAF50"/>
-        <SolidColorBrush x:Key="HudUploadColor" Color="#FF9800"/>
+        <!-- Transparent versions of theme brushes for HUD -->
+        <SolidColorBrush x:Key="HudBackground" Color="{StaticResource BgBrush}"/>
+        <SolidColorBrush x:Key="HudBorder" Color="{StaticResource SurfaceBrush}"/>
+        <SolidColorBrush x:Key="HudTextSecondary" Color="{StaticResource TextBrush}"/>
+        <SolidColorBrush x:Key="HudDownloadColor" Color="{StaticResource GreenBrush}"/>
+        <SolidColorBrush x:Key="HudUploadColor" Color="{StaticResource OrangeBrush}"/>
     </Window.Resources>
 
     <Border CornerRadius="8" Background="{StaticResource HudBackground}" BorderBrush="{StaticResource HudBorder}" BorderThickness="1"
