@@ -9,11 +9,11 @@
 
     <Window.Resources>
         <!-- Transparent versions of theme brushes for HUD -->
-        <SolidColorBrush x:Key="HudBackground" Color="{StaticResource BgBrush}"/>
-        <SolidColorBrush x:Key="HudBorder" Color="{StaticResource SurfaceBrush}"/>
-        <SolidColorBrush x:Key="HudTextSecondary" Color="{StaticResource TextBrush}"/>
-        <SolidColorBrush x:Key="HudDownloadColor" Color="{StaticResource GreenBrush}"/>
-        <SolidColorBrush x:Key="HudUploadColor" Color="{StaticResource OrangeBrush}"/>
+        <SolidColorBrush x:Key="HudBackground" Opacity="0.85" Color="{Binding Source={StaticResource BgBrush}, Path=Color}"/>
+        <SolidColorBrush x:Key="HudBorder" Color="{Binding Source={StaticResource SurfaceBrush}, Path=Color}"/>
+        <SolidColorBrush x:Key="HudTextSecondary" Color="{Binding Source={StaticResource TextBrush}, Path=Color}"/>
+        <SolidColorBrush x:Key="HudDownloadColor" Color="{Binding Source={StaticResource GreenBrush}, Path=Color}"/>
+        <SolidColorBrush x:Key="HudUploadColor" Color="{Binding Source={StaticResource OrangeBrush}, Path=Color}"/>
     </Window.Resources>
 
     <Border CornerRadius="8" Background="{StaticResource HudBackground}" BorderBrush="{StaticResource HudBorder}" BorderThickness="1"
