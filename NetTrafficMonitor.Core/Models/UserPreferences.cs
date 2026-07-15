@@ -10,6 +10,7 @@ public class UserPreferences
     // Defaults
     public SpeedUnit DisplayUnit { get; set; } = SpeedUnit.Mbps;
     public DataSizeUnit DataUsageDisplayUnit { get; set; } = DataSizeUnit.MB;
+    public Theme Theme { get; set; } = Theme.System;
     public double PollingIntervalSeconds { get; set; } = 1.0;
     public string FontFamily { get; set; } = "Segoe UI";
     public double FontSize { get; set; } = 12.0;
@@ -46,6 +47,7 @@ public class UserPreferences
             await UpsertAsync(conn, prop.Name, val);
         }
         await UpsertAsync(conn, nameof(DisplayUnit), ((int)DisplayUnit).ToString());
+        await UpsertAsync(conn, nameof(Theme), ((int)Theme).ToString());
         await tx.CommitAsync();
     }
 
@@ -69,6 +71,9 @@ public class UserPreferences
                 break;
             case nameof(DataUsageDisplayUnit):
                 DataUsageDisplayUnit = (DataSizeUnit)int.Parse(val, CultureInfo.InvariantCulture);
+                break;
+            case nameof(Theme):
+                Theme = (Theme)int.Parse(val, CultureInfo.InvariantCulture);
                 break;
             case nameof(PollingIntervalSeconds):
                 PollingIntervalSeconds = double.Parse(val, CultureInfo.InvariantCulture);

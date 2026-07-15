@@ -12,6 +12,7 @@
     <Window.Resources>
         <conv:SpeedUnitToStringConverter x:Key="SpeedUnitToStr"/>
         <conv:DataPeriodToStringConverter x:Key="PeriodToStr"/>
+        <conv:ThemeToStringConverter x:Key="ThemeToStr"/>
     </Window.Resources>
 
     <Grid Margin="15">
@@ -23,6 +24,8 @@
                         <Label Content="Network Adapter" Style="{StaticResource SectionHeader}"/>
                         <ComboBox ItemsSource="{Binding Adapters}" SelectedItem="{Binding SelectedAdapter}" DisplayMemberPath="Name" Height="30" />
                         <Button Content="Refresh Adapters" Command="{Binding LoadAdaptersCommand}" Style="{StaticResource PrimaryButton}" Margin="0,8,0,0"/>
+                        <Label Content="Theme" Style="{StaticResource SectionHeader}"/>
+                        <ComboBox ItemsSource="{Binding Themes}" SelectedItem="{Binding SelectedTheme, Converter={StaticResource ThemeToStr}}" Height="30" />
                         <Label Content="Display Unit" Style="{StaticResource SectionHeader}"/>
                         <ComboBox ItemsSource="{Binding SpeedUnits}" SelectedItem="{Binding SelectedUnit}" Height="30" />
                         <Label Content="Font" Style="{StaticResource SectionHeader}"/>

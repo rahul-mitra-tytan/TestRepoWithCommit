@@ -52,6 +52,9 @@ public partial class App : System.Windows.Application
         _prefs = new UserPreferences();
         await _prefs.LoadAsync(_conn);
 
+        // Apply selected theme
+        ApplyTheme();
+
         // Start monitor
         _monitor = new NetworkMonitorService(DbPath);
         await _monitor.InitializeAsync();
@@ -75,6 +78,45 @@ public partial class App : System.Windows.Application
 
         if (!_prefs.StartMinimized)
             ShowSettingsWindow();
+
+        ApplyTheme();
+    }
+
+    private void ApplyTheme()
+    {
+        var theme = _prefs.Theme;
+        Dispatcher.InvokeAsync(() =>
+        {
+            var resources = Application.Current.Resources as ResourceDictionary;
+            if (resources == null) return;
+
+            var merged = resources.MergedDictionaries;
+            var darkStyles = merged.FirstOrDefault(d => d.Source?.ToString() == "Resources/Styles.xaml");
+            var lightStyles = merged.FirstOrDefault(d => d.Source?.ToString() == "Resources/LightStyles.xaml");
+
+            if (theme == Theme.Dark)
+            {
+                if (lightStyles != null)
+                {
+                    merged.Remove(lightStyles);
+                }
+            }
+            else // Light or System
+            {
+                if (darkStyles != null)
+                {
+                    merged.Remove(darkStyles);
+                }
+                if (lightStyles == null)
+                {
+                    // Add light styles if not already merged (e.g. after a theme change)
+                    merged.Insert(0, new ResourceDictionary
+                    {
+                        Source = new Uri("Resources/LightStyles.xaml", UriKind.Relative)
+                    });
+                }
+            }
+        });
     }
 
     private void CreateTrayIcon()

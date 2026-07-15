@@ -98,6 +98,21 @@ public partial class SettingsViewModel : INotifyPropertyChanged
     }
     private NetworkAdapter? _selectedAdapter;
 
+    public ObservableCollection<Theme> Themes => _themes;
+    private readonly ObservableCollection<Theme> _themes = new() { Theme.Dark, Theme.Light, Theme.System };
+    public Theme SelectedTheme
+    {
+        get => _selectedTheme;
+        set
+        {
+            _selectedTheme = value;
+            _prefs.Theme = value;
+            ApplyTheme();
+            OnPropertyChanged();
+        }
+    }
+    private Theme _selectedTheme;
+
     public string FontFamily { get => _prefs.FontFamily; set { _prefs.FontFamily = value; OnPropertyChanged(); } }
     public double FontSize { get => _prefs.FontSize; set { _prefs.FontSize = value; OnPropertyChanged(); } }
     public bool StartMinimized { get => _prefs.StartMinimized; set { _prefs.StartMinimized = value; OnPropertyChanged(); } }

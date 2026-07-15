@@ -1,0 +1,19 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Base Colors (Light Theme) -->
+    <Color x:Key="LightBgColor">#F2F2F2</Color>
+    <Color x:Key="LightSurfaceColor">#FFFFFF</Color>
+    <Color x:Key="LightControlBgColor">#FFFFFF</Color>
+    <Color x:Key="LightBorderColor">#D1D1D1</Color>
+    <Color x:Key="LightTextColor">#1E1E1E</Color>
+    <Color x:Key="LightTextSecondaryColor">#666666</Color>
+
+    <SolidColorBrush x:Key="LightBg" Color="{StaticResource LightBgColor}"/>
+    <SolidColorBrush x:Key="LightSurface" Color="{StaticResource LightSurfaceColor}"/>
+    <SolidColorBrush x:Key="LightControlBg" Color="{StaticResource LightControlBgColor}"/>
+    <SolidColorBrush x:Key="LightBorder" Color="{StaticResource LightBorderColor}"/>
+    <SolidColorBrush x:Key="LightText" Color="{StaticResource LightTextColor}"/>
+    <SolidColorBrush x:Key="LightTextSecondary" Color="{StaticResource LightTextSecondaryColor}"/>
+
+</ResourceDictionary>
