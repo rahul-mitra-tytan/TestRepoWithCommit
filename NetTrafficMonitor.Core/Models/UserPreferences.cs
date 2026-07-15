@@ -22,6 +22,7 @@ public class UserPreferences
     public double HudOpacity { get; set; } = 0.7;
     public bool HudClickThrough { get; set; } = false;
     public int SelectedAdapterId { get; set; } = 0;
+    public bool UseCustomDateRange { get; set; } = false;
 
     public async Task LoadAsync(SqliteConnection conn)
     {
@@ -40,6 +41,7 @@ public class UserPreferences
     {
         var props = GetType().GetProperties()
             .Where(p => p.Name != nameof(DisplayUnit)); // we store unit specially
+
         using var tx = await conn.BeginTransactionAsync();
         foreach (var prop in props)
         {
@@ -55,7 +57,8 @@ public class UserPreferences
     {
         using var cmd = conn.CreateCommand();
         cmd.CommandText = $@"
-            INSERT INTO {TableName} (key, value) VALUES (@k, @v)
+            INSERT INTO {TableName} (key, value)
+            VALUES (@k, @v)
             ON CONFLICT(key) DO UPDATE SET value = @v";
         cmd.Parameters.AddWithValue("@k", key);
         cmd.Parameters.AddWithValue("@v", value);
@@ -107,6 +110,9 @@ public class UserPreferences
                 break;
             case nameof(FontFamily):
                 FontFamily = val;
+                break;
+            case nameof(UseCustomDateRange):
+                UseCustomDateRange = bool.Parse(val);
                 break;
         }
     }
