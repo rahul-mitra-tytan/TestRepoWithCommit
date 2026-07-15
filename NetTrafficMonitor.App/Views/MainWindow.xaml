@@ -13,16 +13,6 @@
         <conv:SpeedUnitToStringConverter x:Key="SpeedUnitToStr"/>
         <conv:DataPeriodToStringConverter x:Key="PeriodToStr"/>
         <conv:ThemeToStringConverter x:Key="ThemeToStr"/>
-        <SolidColorBrush x:Key="BgBrush" Color="#1E1E1E"/>
-        <SolidColorBrush x:Key="TextBrush" Color="#E0E0E0"/>
-        <SolidColorBrush x:Key="SubTextBrush" Color="#AAAAAA"/>
-        <SolidColorBrush x:Key="SurfaceBrush" Color="#2D2D2D"/>
-        <SolidColorBrush x:Key="BorderBrush" Color="#3A3A3A"/>
-        <SolidColorBrush x:Key="HoverBrush" Color="#3D3D3D"/>
-        <SolidColorBrush x:Key="AccentBrush" Color="#0078D4"/>
-        <SolidColorBrush x:Key="ButtonBg" Color="#005A9E"/>
-        <SolidColorBrush x:Key="ButtonText" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="ButtonHoverBg" Color="#0066CC"/>
     </Window.Resources>
 
     <Grid Margin="15">
