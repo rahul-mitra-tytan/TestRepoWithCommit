@@ -150,15 +150,15 @@ public partial class HudWindow : Window, INotifyPropertyChanged
         if (max <= 0) max = 1;
 
         // Build polyline points
-        var dl = new List<Point>();
-        var up = new List<Point>();
+        var dl = new List<System.Windows.Point>();
+        var up = new List<System.Windows.Point>();
 
         int i = 0;
         foreach (var d in _downloadHistory)
         {
             double x = (i / (double)(MaxHistory - 1)) * w;
             double y = h - (d / max) * (h - 10) - 5; // 5px padding
-            dl.Add(new Point(x, y));
+            dl.Add(new System.Windows.Point(x, y));
             i++;
         }
 
@@ -167,7 +167,7 @@ public partial class HudWindow : Window, INotifyPropertyChanged
         {
             double x = (i / (double)(MaxHistory - 1)) * w;
             double y = h - (u / max) * (h - 10) - 5;
-            up.Add(new Point(x, y));
+            up.Add(new System.Windows.Point(x, y));
             i++;
         }
 
@@ -175,7 +175,7 @@ public partial class HudWindow : Window, INotifyPropertyChanged
         UploadGraph.Data = Geometry.Parse(PolylinePoints(up));
     }
 
-    private static string PolylinePoints(IList<Point> pts)
+    private static string PolylinePoints(IList<System.Windows.Point> pts)
     {
         if (pts.Count == 0) return string.Empty;
         var s = $"M {pts[0].X},{pts[0].Y}";
