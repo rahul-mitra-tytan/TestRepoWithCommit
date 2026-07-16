@@ -126,6 +126,9 @@ public partial class HudWindow : Window, INotifyPropertyChanged
             GraphView.Visibility = _viewMode == HudViewMode.Graph ? Visibility.Visible : Visibility.Collapsed;
             if (_viewMode == HudViewMode.Graph) DrawGraph();
         }
+
+        // Resize HUD depending on view mode
+        Height = _viewMode == HudViewMode.Speed ? 110 : 220;
     }
 
     private void DrawGraph()

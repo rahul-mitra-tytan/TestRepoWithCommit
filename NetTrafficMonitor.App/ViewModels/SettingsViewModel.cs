@@ -29,6 +29,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
 
         _speedUnits = new ObservableCollection<SpeedUnit>(Enum.GetValues<SpeedUnit>());
         _selectedUnit = _prefs.DisplayUnit;
+
         _selectedTheme = _prefs.Theme;
 
         _dataSizeUnits = new ObservableCollection<DataSizeUnit>(Enum.GetValues<DataSizeUnit>());
@@ -37,6 +38,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
         _dataPeriods = new ObservableCollection<DataPeriod>(Enum.GetValues<DataPeriod>());
         _selectedPeriod = DataPeriod.Today;
         _useCustomDateRange = _prefs.UseCustomDateRange;
+
         _startDate = DateTime.Today.AddDays(-1);
         _endDate = DateTime.Today;
 
@@ -53,6 +55,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
 
     public ObservableCollection<SpeedUnit> SpeedUnits => _speedUnits;
     private readonly ObservableCollection<SpeedUnit> _speedUnits;
+
     public SpeedUnit SelectedUnit
     {
         get => _selectedUnit;
@@ -66,6 +69,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
 
     public ObservableCollection<DataSizeUnit> DataSizeUnits => _dataSizeUnits;
     private readonly ObservableCollection<DataSizeUnit> _dataSizeUnits;
+
     public DataSizeUnit SelectedDataSizeUnit
     {
         get => _selectedDataSizeUnit;
@@ -82,17 +86,15 @@ public partial class SettingsViewModel : INotifyPropertyChanged
 
     public ObservableCollection<DataPeriod> DataPeriods => _dataPeriods;
     private readonly ObservableCollection<DataPeriod> _dataPeriods;
+
     public DataPeriod SelectedPeriod
     {
         get => _selectedPeriod;
         set
         {
             _selectedPeriod = value;
-            if (value == DataPeriod.Custom)
-                _useCustomDateRange = true;
-            else
-                _useCustomDateRange = false;
-
+            if (value == DataPeriod.Custom) _useCustomDateRange = true;
+            else _useCustomDateRange = false;
             OnPropertyChanged();
             OnPropertyChanged(nameof(ShowCustomDateRange));
             OnPropertyChanged(nameof(UseCustomDateRange));
@@ -107,13 +109,9 @@ public partial class SettingsViewModel : INotifyPropertyChanged
         set
         {
             if (_useCustomDateRange == value) return;
-
             _useCustomDateRange = value;
-            if (value)
-                SelectedPeriod = DataPeriod.Custom;
-            else
-                SelectedPeriod = DataPeriod.Today;
-
+            if (value) SelectedPeriod = DataPeriod.Custom;
+            else SelectedPeriod = DataPeriod.Today;
             OnPropertyChanged();
         }
     }
@@ -121,6 +119,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
 
     public ObservableCollection<NetworkAdapter> Adapters => _adapters;
     private readonly ObservableCollection<NetworkAdapter> _adapters;
+
     public NetworkAdapter? SelectedAdapter
     {
         get => _selectedAdapter;
@@ -134,14 +133,17 @@ public partial class SettingsViewModel : INotifyPropertyChanged
 
     public ObservableCollection<Theme> Themes => _themes;
     private readonly ObservableCollection<Theme> _themes = new() { Theme.Dark, Theme.Light, Theme.System };
+
     public Theme SelectedTheme
     {
         get => _selectedTheme;
         set
         {
+            if (_selectedTheme == value) return;
             _selectedTheme = value;
             _prefs.Theme = value;
             OnPropertyChanged();
+            App.ApplyTheme(value);
         }
     }
     private Theme _selectedTheme;
@@ -155,6 +157,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
+
     public double FontSize
     {
         get => _prefs.FontSize;
@@ -164,6 +167,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
+
     public bool StartMinimized
     {
         get => _prefs.StartMinimized;
@@ -173,6 +177,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
+
     public bool MinimizeToTray
     {
         get => _prefs.MinimizeToTray;
@@ -182,6 +187,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
+
     public bool RunOnStartup
     {
         get => _prefs.RunOnStartup;
@@ -191,6 +197,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
+
     public bool HudEnabled
     {
         get => _prefs.HudEnabled;
@@ -200,6 +207,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
+
     public double HudOpacity
     {
         get => _prefs.HudOpacity;
@@ -217,8 +225,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
         {
             _startDate = value;
             OnPropertyChanged();
-            if (SelectedPeriod == DataPeriod.Custom)
-                _ = RefreshUsageAsync();
+            if (SelectedPeriod == DataPeriod.Custom) _ = RefreshUsageAsync();
         }
     }
     private DateTime _startDate;
@@ -230,8 +237,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
         {
             _endDate = value;
             OnPropertyChanged();
-            if (SelectedPeriod == DataPeriod.Custom)
-                _ = RefreshUsageAsync();
+            if (SelectedPeriod == DataPeriod.Custom) _ = RefreshUsageAsync();
         }
     }
     private DateTime _endDate;
@@ -255,8 +261,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
         foreach (var a in adapters)
         {
             _adapters.Add(a);
-            if (a.IsSelected)
-                _selectedAdapter = a;
+            if (a.IsSelected) _selectedAdapter = a;
         }
         OnPropertyChanged(nameof(SelectedAdapter));
     }
@@ -278,8 +283,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
     private async Task RefreshUsageAsync()
     {
         int adapterId = _selectedAdapter?.Id ?? _monitor.CurrentAdapterId;
-        if (adapterId <= 0)
-            return;
+        if (adapterId <= 0) return;
 
         DateTime? customStart = null;
         DateTime? customEnd = null;
@@ -291,7 +295,6 @@ public partial class SettingsViewModel : INotifyPropertyChanged
 
         PeriodDownloadBytes = await _aggregator.GetBytesDownloadedAsync(adapterId, _selectedPeriod, customStart, customEnd);
         PeriodUploadBytes = await _aggregator.GetBytesUploadedAsync(adapterId, _selectedPeriod, customStart, customEnd);
-
         OnPropertyChanged(nameof(PeriodDownloadBytes));
         OnPropertyChanged(nameof(PeriodUploadBytes));
         OnPropertyChanged(nameof(PeriodFormattedDownload));
@@ -299,8 +302,7 @@ public partial class SettingsViewModel : INotifyPropertyChanged
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
-    protected void OnPropertyChanged([CallerMemberName] string? name = null) =>
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    protected void OnPropertyChanged([CallerMemberName] string? name = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }
 
 public class AsyncRelayCommand : ICommand
@@ -309,14 +311,13 @@ public class AsyncRelayCommand : ICommand
     private bool _isExecuting;
 
     public AsyncRelayCommand(Func<Task> execute) => _execute = execute;
-    public event EventHandler? CanExecuteChanged;
 
+    public event EventHandler? CanExecuteChanged;
     public bool CanExecute(object? parameter) => !_isExecuting;
+
     public async void Execute(object? parameter)
     {
-        if (_isExecuting)
-            return;
-
+        if (_isExecuting) return;
         _isExecuting = true;
         CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         try

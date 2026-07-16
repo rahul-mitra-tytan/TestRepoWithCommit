@@ -99,17 +99,24 @@ public partial class App : System.Windows.Application
                 if (resources == null) return;
 
                 var merged = resources.MergedDictionaries;
-                bool hasLight = merged.Any(d => d.Source?.ToString() == "Resources/LightStyles.xaml");
+                bool hasLight = merged.Any(d =>
+                    d.Source is not null &&
+                    d.Source.OriginalString.EndsWith("LightStyles.xaml", StringComparison.OrdinalIgnoreCase));
 
                 if (selected == Theme.Dark)
                 {
+                    // Remove Light override so only dark base/styles remain
                     if (hasLight)
                     {
-                        merged.Remove(merged.First(d => d.Source?.ToString() == "Resources/LightStyles.xaml"));
+                        var light = merged.First(d =>
+                            d.Source is not null &&
+                            d.Source.OriginalString.EndsWith("LightStyles.xaml", StringComparison.OrdinalIgnoreCase));
+                        merged.Remove(light);
                     }
                 }
                 else // Light or System
                 {
+                    // Ensure LightStyles.xaml is present so brushes resolve to light palette
                     if (!hasLight)
                     {
                         merged.Insert(0, new ResourceDictionary
