@@ -21,10 +21,10 @@ public partial class App : System.Windows.Application
     private MainWindow? _settingsWindow;
     private HudWindow? _hudWindow;
 
-    private string DbPath =>
-        Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "NetTrafficMonitor", "data.db");
+    private string DbPath => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "NetTrafficMonitor",
+        "data.db");
 
     private const string MutexName = "NetTrafficMonitor-SingleInstance";
 
@@ -39,7 +39,11 @@ public partial class App : System.Windows.Application
         base.OnStartup(e);
 
         using var mutex = new Mutex(true, MutexName, out bool createdNew);
-        if (!createdNew) { Shutdown(); return; }
+        if (!createdNew)
+        {
+            Shutdown();
+            return;
+        }
 
         Directory.CreateDirectory(Path.GetDirectoryName(DbPath)!);
 
@@ -73,134 +77,147 @@ public partial class App : System.Windows.Application
         }
 
         _monitor.Start();
-
         CreateTrayIcon();
 
         if (!_prefs.StartMinimized)
             ShowSettingsWindow();
-
-        ApplyTheme();
     }
 
-    private void ApplyTheme()
- {
-  var theme = _prefs.Theme;
-  Dispatcher.InvokeAsync(() =>
-  {
-   var resources = System.Windows.Application.Current?.Resources as ResourceDictionary;
-   if (resources == null) return;
-
-   var merged = resources.MergedDictionaries;
-   bool hasLight = merged.Any(d => d.Source?.ToString() == "Resources/LightStyles.xaml");
-
-   if (theme == Theme.Dark)
-   {
-    if (hasLight)
+    public static void ApplyTheme(Theme? theme = null)
     {
-     merged.Remove(merged.First(d => d.Source?.ToString() == "Resources/LightStyles.xaml"));
+        try
+        {
+            var app = (App?)System.Windows.Application.Current;
+            if (app is null) return;
+            var selected = theme ?? app._prefs?.Theme ?? Theme.System;
+
+            app.Dispatcher.InvokeAsync(() =>
+            {
+                var resources = System.Windows.Application.Current?.Resources as ResourceDictionary;
+                if (resources == null) return;
+
+                var merged = resources.MergedDictionaries;
+                bool hasLight = merged.Any(d => d.Source?.ToString() == "Resources/LightStyles.xaml");
+
+                if (selected == Theme.Dark)
+                {
+                    if (hasLight)
+                    {
+                        merged.Remove(merged.First(d => d.Source?.ToString() == "Resources/LightStyles.xaml"));
+                    }
+                }
+                else // Light or System
+                {
+                    if (!hasLight)
+                    {
+                        merged.Insert(0, new ResourceDictionary { Source = new Uri("Resources/LightStyles.xaml", UriKind.Relative) });
+                    }
+                }
+            });
+        }
+        catch
+        {
+            // ignore theme switching errors (safe fallback: keep current resources)
+        }
     }
-   }
-   else // Light or System
-   {
-    if (!hasLight)
+
+    private void CreateTrayIcon()
     {
-     merged.Insert(0, new ResourceDictionary { Source = new Uri("Resources/LightStyles.xaml", UriKind.Relative) });
+        _trayIcon = new NotifyIcon
+        {
+            Icon = GetOrCreateTrayIcon(),
+            Text = "NetTrafficMonitor\n↓ 0 B/s\n↑ 0 B/s",
+            Visible = true
+        };
+
+        var menu = new ContextMenuStrip();
+        menu.Items.Add("Show Settings", null, (_, _) => ShowSettingsWindow());
+        menu.Items.Add("Toggle HUD", null, (_, _) => ToggleHud());
+        menu.Items.Add(new ToolStripSeparator());
+        menu.Items.Add("Exit", null, async (_, _) => await ShutdownAsync());
+
+        _trayIcon.ContextMenuStrip = menu;
+        _trayIcon.MouseDoubleClick += (_, _) => ShowSettingsWindow();
     }
-   }
-  });
- }
 
- private void CreateTrayIcon()
- {
-  _trayIcon = new NotifyIcon
-  {
-   Icon = GetOrCreateTrayIcon(),
-   Text = "NetTrafficMonitor\n↓ 0 B/s\n↑ 0 B/s",
-   Visible = true
-  };
-  var menu = new ContextMenuStrip();
-  menu.Items.Add("Show Settings", null, (_, _) => ShowSettingsWindow());
-  menu.Items.Add("Toggle HUD", null, (_, _) => ToggleHud());
-  menu.Items.Add(new ToolStripSeparator());
-  menu.Items.Add("Exit", null, async (_, _) => await ShutdownAsync());
-  _trayIcon.ContextMenuStrip = menu;
-  _trayIcon.MouseDoubleClick += (_, _) => ShowSettingsWindow();
- }
+    private static System.Drawing.Icon GetOrCreateTrayIcon()
+    {
+        try
+        {
+            // Use a simple 16×16 canvas-drawn icon
+            var bmp = new System.Drawing.Bitmap(16, 16);
+            using var g = System.Drawing.Graphics.FromImage(bmp);
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            using var brush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(0x00, 0x78, 0xD4));
+            g.FillEllipse(brush, 0, 0, 15, 15);
 
- private static System.Drawing.Icon GetOrCreateTrayIcon()
- {
-  try
-  {
-   // Use a simple 16×16 canvas-drawn icon
-   var bmp = new System.Drawing.Bitmap(16, 16);
-   using var g = System.Drawing.Graphics.FromImage(bmp);
-   g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-   using var brush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(0x00, 0x78, 0xD4));
-   g.FillEllipse(brush, 0, 0, 15, 15);
-   var hIcon = bmp.GetHicon();
-   return System.Drawing.Icon.FromHandle(hIcon);
-  }
-  catch
-  {
-   return System.Drawing.SystemIcons.Application;
-  }
- }
+            var hIcon = bmp.GetHicon();
+            return System.Drawing.Icon.FromHandle(hIcon);
+        }
+        catch
+        {
+            return System.Drawing.SystemIcons.Application;
+        }
+    }
 
- private async void OnSpeedUpdated((double downBps, double upBps) speed)
- {
-  if (_prefs is null) return;
-  string down = SpeedConverter.Format(speed.downBps, _prefs.DisplayUnit);
-  string up = SpeedConverter.Format(speed.upBps, _prefs.DisplayUnit);
+    private async void OnSpeedUpdated((double downBps, double upBps) speed)
+    {
+        if (_prefs is null) return;
 
-  await Dispatcher.InvokeAsync(() =>
-  {
-   if (_trayIcon is not null) _trayIcon.Text = $"NetTrafficMonitor\n↓ {down}\n↑ {up}";
+        string down = SpeedConverter.Format(speed.downBps, _prefs.DisplayUnit);
+        string up = SpeedConverter.Format(speed.upBps, _prefs.DisplayUnit);
 
-   if (_hudWindow is not null && _hudWindow.IsVisible)
-    _hudWindow.UpdateSpeed(speed.downBps, speed.upBps);
-  });
- }
+        await Dispatcher.InvokeAsync(() =>
+        {
+            if (_trayIcon is not null)
+                _trayIcon.Text = $"NetTrafficMonitor\n↓ {down}\n↑ {up}";
 
- public void ShowSettingsWindow()
- {
-  if (_settingsWindow is not { IsVisible: true })
-  {
-   _settingsWindow = new MainWindow(_monitor!, _prefs!, _conn!);
-   _settingsWindow.Show();
-  }
-  _settingsWindow.Activate();
- }
+            if (_hudWindow is not null && _hudWindow.IsVisible)
+                _hudWindow.UpdateSpeed(speed.downBps, speed.upBps);
+        });
+    }
 
- public void ToggleHud()
- {
-  if (_hudWindow is { IsVisible: true })
-  {
-   _hudWindow.Hide();
-   _hudWindow = null;
-   _prefs!.HudEnabled = false;
-  }
-  else
-  {
-   _hudWindow = new HudWindow(_monitor!, _prefs!);
-   _hudWindow.Show();
-   _prefs!.HudEnabled = true;
-  }
- }
+    public void ShowSettingsWindow()
+    {
+        if (_settingsWindow is not { IsVisible: true })
+        {
+            _settingsWindow = new MainWindow(_monitor!, _prefs!, _conn!);
+            _settingsWindow.Show();
+        }
 
- private async Task ShutdownAsync()
- {
-  _monitor?.Stop();
-  _prefs?.SaveAsync(_conn!).Wait(2000);
-  _trayIcon?.Dispose();
-  _conn?.Close();
-  _conn?.Dispose();
-  Shutdown();
- }
+        _settingsWindow.Activate();
+    }
 
- protected override void OnExit(ExitEventArgs e)
- {
-  _trayIcon?.Dispose();
-  _monitor?.Dispose();
-  base.OnExit(e);
- }
+    public void ToggleHud()
+    {
+        if (_hudWindow is { IsVisible: true })
+        {
+            _hudWindow.Hide();
+            _hudWindow = null;
+            _prefs!.HudEnabled = false;
+        }
+        else
+        {
+            _hudWindow = new HudWindow(_monitor!, _prefs!);
+            _hudWindow.Show();
+            _prefs!.HudEnabled = true;
+        }
+    }
+
+    private async Task ShutdownAsync()
+    {
+        _monitor?.Stop();
+        _prefs?.SaveAsync(_conn!).Wait(2000);
+        _trayIcon?.Dispose();
+        _conn?.Close();
+        _conn?.Dispose();
+        Shutdown();
+    }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        _trayIcon?.Dispose();
+        _monitor?.Dispose();
+        base.OnExit(e);
+    }
 }
