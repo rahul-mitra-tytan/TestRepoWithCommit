@@ -77,6 +77,7 @@ public partial class App : System.Windows.Application
         }
 
         _monitor.Start();
+
         CreateTrayIcon();
 
         if (!_prefs.StartMinimized)
@@ -89,6 +90,7 @@ public partial class App : System.Windows.Application
         {
             var app = (App?)System.Windows.Application.Current;
             if (app is null) return;
+
             var selected = theme ?? app._prefs?.Theme ?? Theme.System;
 
             app.Dispatcher.InvokeAsync(() =>
@@ -110,7 +112,10 @@ public partial class App : System.Windows.Application
                 {
                     if (!hasLight)
                     {
-                        merged.Insert(0, new ResourceDictionary { Source = new Uri("Resources/LightStyles.xaml", UriKind.Relative) });
+                        merged.Insert(0, new ResourceDictionary
+                        {
+                            Source = new Uri("Resources/LightStyles.xaml", UriKind.Relative)
+                        });
                     }
                 }
             });
@@ -144,7 +149,7 @@ public partial class App : System.Windows.Application
     {
         try
         {
-            // Use a simple 16×16 canvas-drawn icon
+            // Use a simple 16x16 canvas-drawn icon
             var bmp = new System.Drawing.Bitmap(16, 16);
             using var g = System.Drawing.Graphics.FromImage(bmp);
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
@@ -171,9 +176,6 @@ public partial class App : System.Windows.Application
         {
             if (_trayIcon is not null)
                 _trayIcon.Text = $"NetTrafficMonitor\n↓ {down}\n↑ {up}";
-
-            if (_hudWindow is not null && _hudWindow.IsVisible)
-                _hudWindow.UpdateSpeed(speed.downBps, speed.upBps);
         });
     }
 
@@ -211,6 +213,7 @@ public partial class App : System.Windows.Application
         _trayIcon?.Dispose();
         _conn?.Close();
         _conn?.Dispose();
+
         Shutdown();
     }
 

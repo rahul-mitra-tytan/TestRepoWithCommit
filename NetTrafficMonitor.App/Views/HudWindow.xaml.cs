@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using NetTrafficMonitor.Core.Models;
 using NetTrafficMonitor.Core.Services;
 using NetTrafficMonitor.Service;
@@ -21,7 +22,6 @@ public partial class HudWindow : Window, INotifyPropertyChanged
 {
     private readonly NetworkMonitorService _monitor;
     private readonly UserPreferences _prefs;
-
     private const int MaxHistory = 60;
 
     public bool ClickThrough { get; set; }
@@ -73,13 +73,16 @@ public partial class HudWindow : Window, INotifyPropertyChanged
         Top = screenHeight - Height - 60;
         Opacity = prefs.HudOpacity;
 
-        UpdateSpeed(monitor.CurrentDownloadBps, monitor.CurrentUploadBps);
+        UpdateSpeedText();
 
         // Subscribe for live updates
         _monitor.SpeedUpdated += OnSpeedUpdated;
 
         // Right-click to open context menu
-        MouseRightButtonUp += (_, __) => ContextMenu?.IsOpen = true;
+        MouseRightButtonUp += (_, __) =>
+        {
+            if (ContextMenu != null) ContextMenu.IsOpen = true;
+        };
     }
 
     private void OnSpeedUpdated((double downBps, double upBps) speed)
@@ -95,14 +98,10 @@ public partial class HudWindow : Window, INotifyPropertyChanged
             // Push history for graph mode
             _downloadHistory.Enqueue(speed.downBps);
             _uploadHistory.Enqueue(speed.upBps);
+            while (_downloadHistory.Count > MaxHistory) _downloadHistory.Dequeue();
+            while (_uploadHistory.Count > MaxHistory) _uploadHistory.Dequeue();
 
-            while (_downloadHistory.Count > MaxHistory)
-                _downloadHistory.Dequeue();
-            while (_uploadHistory.Count > MaxHistory)
-                _uploadHistory.Dequeue();
-
-            if (_viewMode == HudViewMode.Graph)
-                DrawGraph();
+            if (_viewMode == HudViewMode.Graph) DrawGraph();
         });
     }
 
@@ -118,46 +117,40 @@ public partial class HudWindow : Window, INotifyPropertyChanged
     private void UpdateViewVisibility()
     {
         if (SpeedView != null)
+        {
             SpeedView.Visibility = _viewMode == HudViewMode.Speed ? Visibility.Visible : Visibility.Collapsed;
+        }
 
         if (GraphView != null)
         {
             GraphView.Visibility = _viewMode == HudViewMode.Graph ? Visibility.Visible : Visibility.Collapsed;
-            if (_viewMode == HudViewMode.Graph)
-                DrawGraph();
+            if (_viewMode == HudViewMode.Graph) DrawGraph();
         }
     }
 
     private void DrawGraph()
     {
-        if (GraphView == null || DownloadGraph == null || UploadGraph == null)
-            return;
-
-        if (_downloadHistory.Count < 2)
-            return;
+        if (GraphView == null || DownloadGraph == null || UploadGraph == null) return;
+        if (_downloadHistory.Count < 2) return;
 
         double w = GraphView.ActualWidth;
         double h = GraphView.ActualHeight;
-        if (w <= 0 || h <= 0)
-            return;
+        if (w <= 0 || h <= 0) return;
 
         // Find max for scaling
         double max = 0;
-        foreach (var v in _downloadHistory)
-            if (v > max) max = v;
-        foreach (var v in _uploadHistory)
-            if (v > max) max = v;
+        foreach (var v in _downloadHistory) if (v > max) max = v;
+        foreach (var v in _uploadHistory) if (v > max) max = v;
         if (max <= 0) max = 1;
 
         // Build polyline points
         var dl = new List<System.Windows.Point>();
         var up = new List<System.Windows.Point>();
-
         int i = 0;
         foreach (var d in _downloadHistory)
         {
             double x = (i / (double)(MaxHistory - 1)) * w;
-            double y = h - (d / max) * (h - 10) - 5; // 5px padding
+            double y = h - (d / max) * (h - 10) - 5;
             dl.Add(new System.Windows.Point(x, y));
             i++;
         }
@@ -178,10 +171,14 @@ public partial class HudWindow : Window, INotifyPropertyChanged
     private static string PolylinePoints(IList<System.Windows.Point> pts)
     {
         if (pts.Count == 0) return string.Empty;
-        var s = $"M {pts[0].X},{pts[0].Y}";
+        var s = new System.Text.StringBuilder();
+        s.Append($"M {pts[0].X:F1},{pts[0].Y:F1}");
         for (int i = 1; i < pts.Count; i++)
-            s += $" L {pts[i].X},{pts[i].Y}";
-        return s;
+        {
+            s.Append($" L {pts[i].X:F1},{pts[i].Y:F1}");
+        }
+
+        return s.ToString();
     }
 
     private void OnSpeedViewClick(object sender, RoutedEventArgs e) => ViewMode = HudViewMode.Speed;
@@ -203,8 +200,9 @@ public partial class HudWindow : Window, INotifyPropertyChanged
     protected override void OnMouseDown(MouseButtonEventArgs e)
     {
         if (e.ChangedButton == MouseButton.Left)
+        {
             DragMove();
-
+        }
         base.OnMouseDown(e);
     }
 
